@@ -26,8 +26,8 @@ Dockerを使って開発サーバーを建てる手順について説明しま�
 
 ### バックエンドの準備
 ```sh
-git clone https://github.com/ProjectEuropa/project-oss-calendar project-oss-calendar
-cd project-oss-calendar
+git clone https://github.com/ProjectEuropa/oss-calendar.git oss-calendar
+cd oss-calendar
 docker-compose build
 docker-compose up -d
 ```
@@ -38,8 +38,6 @@ cp .env.example .env
 * クライアントサーバとAPIサーバの.envファイルの設定例：  
 
 ```txt
-APP_URL=http://localhost #APIServerのURLを指定
-CLIENT_URL=http://localhost #クライアントのURLを指定、HTMLを配信する場所
 
 DB_CONNECTION=mysql
 DB_HOST=mysql
@@ -61,8 +59,8 @@ MAIL_FROM_NAME="シンキングリード"
 #### Laravelのセットアップ
 ```bash
 # Dockerコンテナにログインして、Composerで関連ファイルをInstallする
-docker-compose exec web bash
-
+docker ps
+docker exec -it [container_id] bash
 # ここからコンテナ内
 cd /var/www/html/
 composer install
@@ -83,7 +81,7 @@ php artisan passport:install
 > * もし、開発時にLaravelのコードが反映されない場合、php artisan optimizeでキャッシュをクリアする
 
 ### フロントエンドの準備
-
+ここではDockerではなく、クライアント側でnpmを実行手順を紹介する
 
 * クライアントのコマンド実行例： 
 ```bash
@@ -96,16 +94,10 @@ npm run dev
 ### 補足
 APIサーバには設定ファイルがキャッシュ化されているため、設定変更した場合は、`php artisan optimize`コマンドを実行する。
 
-## 本番環境（加筆中）
-クライアントサーバとAPIサーバを同一サーバにとして稼働させる  
-※同一サーバにすることでサーバのメンテナンスコストを削減できる  
 
-* envの設定例：
-```bash
-CLIENT_URL=http://localhost
-APP_URL=http://localhost
-※CLIENT_URLとAPP_URLは同じにする
-```
+* 同一サーバで稼働させる  
+apacheのドキュメントルートをpublic/以下に設定し、稼働させる  
+APIサーバには設定ファイルがキャッシュ化されているため、設定変更した場合は、`php artisan optimize`コマンドを実行する。
 
 ### Cronの設定
 予定のメール通知を受け取るために、以下のスクリプトをcronに登録する
